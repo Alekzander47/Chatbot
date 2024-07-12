@@ -1,6 +1,6 @@
 from llama_index.core import VectorStoreIndex, SimpleDirectoryReader, Settings
 from llama_index.embeddings.huggingface import HuggingFaceEmbedding
-from langchain_community.llms import Ollama
+from llama_index.llms.ollama import Ollama
 
 # My local documents
 documents = SimpleDirectoryReader("data").load_data()

@@ -22,7 +22,7 @@ def create_index_from_files(uploaded_files):
         return VectorStoreIndex.from_documents(documents)
 
 # Define a prompt template for the chatbot
-prompt = ChatPromptTemplate.from_messages(
+prompt_template = ChatPromptTemplate.from_messages(
     [
         ("system", "You are a helpful assistant. Please respond to the questions."),
         ("user", "Question: {question}")
@@ -41,9 +41,6 @@ input_text = st.text_input("Ask your question!")
 # Initialize the Ollama model
 llm = Ollama(model="llama3")
 
-# Create a chain that combines the prompt and the Ollama model
-chain = prompt | llm
-
 # Function to handle the response
 def get_response(input_text, index):
     try:
@@ -52,10 +49,11 @@ def get_response(input_text, index):
             if response:
                 return response
         # Fall back to regular LLM response if no document response or no index
-        response = chain.invoke({"question": input_text})
+        formatted_prompt = prompt_template.format(question=input_text)
+        response = llm(formatted_prompt)
         return response
     except Exception as e:
-        return f"Error invoking the model: {e}\nEnsure the LLAMA2 model is properly pulled. Run 'ollama pull llama2' in the terminal."
+        return f"Error invoking the model: {e}\nEnsure the LLAMA3 model is properly pulled. Run 'ollama pull llama3' in the terminal."
 
 # Initialize the document index if files are uploaded
 index = None
