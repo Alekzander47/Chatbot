@@ -27,7 +27,7 @@ llm = Ollama(model="llama3")
 chain = prompt | llm
 
 # Set up the Streamlit framework
-st.title('Ask any questions <-_->')  # Set the title of the Streamlit app
+st.title('Ask any questions  if related to document <-_->')  # Set the title of the Streamlit app
 
 # File uploader for documents
 uploaded_files = st.file_uploader("Upload documents", accept_multiple_files=True)
