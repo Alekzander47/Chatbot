@@ -1,20 +1,126 @@
+import streamlit as st
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_community.llms import Ollama
 from llama_index.core import VectorStoreIndex, SimpleDirectoryReader, Settings
-from llama_index.embeddings.huggingface import HuggingFaceEmbedding
-from llama_index.llms.ollama import Ollama
+from sentence_transformers import SentenceTransformer
+from sklearn.metrics.pairwise import cosine_similarity
+import tempfile
+import os
+import numpy as np
 
-# My local documents
-documents = SimpleDirectoryReader("data").load_data()
+# Initialize the Streamlit app with session state to maintain chat history
+if 'chat_history' not in st.session_state:
+    st.session_state['chat_history'] = []
 
-# Embeddings model
-Settings.embed_model = HuggingFaceEmbedding(model_name="BAAI/bge-base-en-v1.5")
+# Define a prompt template for the chatbot
+prompt = ChatPromptTemplate.from_messages(
+    [
+        ("system", "You are a helpful assistant. Please respond to the questions."),
+        ("user", "Question:{question}")
+    ]
+)
 
-# Language model
-Settings.llm = Ollama(model="llama3", request_timeout=360.0)
+# Initialize the Ollama model
+llm = Ollama(model="llama3")
 
-# Create index
-index = VectorStoreIndex.from_documents(documents)
+# Create a chain that combines the prompt and the Ollama model
+chain = prompt | llm
 
-# Perform RAG query
-query_engine = index.as_query_engine()
-response = query_engine.query("What are the 5 stages of RAG?")
-print(response)
+# Set up the Streamlit framework
+st.title('Ask any questions <-_->')  # Set the title of the Streamlit app
+
+# File uploader for documents
+uploaded_files = st.file_uploader("Upload documents", accept_multiple_files=True)
+
+# Initialize the sentence transformer model
+embedding_model = SentenceTransformer('sentence-transformers/paraphrase-MiniLM-L6-v2')
+
+def get_document_embeddings(documents):
+    embeddings = embedding_model.encode([document.text for document in documents])
+    return np.array(embeddings)
+
+def find_similar_documents(query, documents, doc_embeddings):
+    query_embedding = embedding_model.encode([query]).reshape(1, -1)
+    similarities = cosine_similarity(query_embedding, doc_embeddings).flatten()
+    ranked_indices = similarities.argsort()[::-1]
+    return [documents[i] for i in ranked_indices[:5]]  # Retrieve top 5 documents
+
+def perform_rag_query(documents, query):
+    # Get document embeddings
+    doc_embeddings = get_document_embeddings(documents)
+    
+    # Find similar documents
+    similar_docs = find_similar_documents(query, documents, doc_embeddings)
+    
+    # Combine the content of similar documents into a single response
+    response = "\n\n".join([doc.text for doc in similar_docs])
+    return response
+
+documents = []
+response = ""
+
+input_text = st.text_input("Ask your question!")  # Create a text input field in the Streamlit app
+
+if uploaded_files:
+    with tempfile.TemporaryDirectory() as temp_dir:
+        # Save uploaded files to the temp directory
+        for uploaded_file in uploaded_files:
+            with open(os.path.join(temp_dir, uploaded_file.name), "wb") as f:
+                f.write(uploaded_file.getbuffer())
+        
+        # Load documents from the temp directory
+        documents = SimpleDirectoryReader(temp_dir).load_data()
+        
+        if input_text:
+            # Perform RAG query
+            response = perform_rag_query(documents, input_text)
+
+if input_text:
+    try:
+        # Perform RAG query if documents are uploaded
+        if documents:
+            document_response = perform_rag_query(documents, input_text)
+            final_response = f"Document-Based Answer:\n{document_response}\n\nModel-Based Answer:\n"
+        else:
+            final_response = "Model-Based Answer:\n"
+        
+        # Get model response
+        model_response = chain.invoke({"question": input_text})
+        final_response += model_response
+
+        response = final_response
+
+        # Append the user input and model response to the chat history
+        st.session_state['chat_history'].append({"role": "user", "content": input_text})
+        st.session_state['chat_history'].append({"role": "assistant", "content": response})
+
+    except Exception as e:
+        st.error(f"Error invoking the model: {e}")
+        st.error("Ensure the LLAMA3 model is properly pulled. Run 'ollama pull llama3' in the terminal.")
+        response = ""
+
+# Display the chat history in the main UI
+for message in st.session_state['chat_history']:
+    if message['role'] == "user":
+        st.write(f"**User:** {message['content']}")
+    else:
+        st.write(f"**Assistant:** {message['content']}")
+
+# Provide an additional prompt for the user to continue the conversation
+if response:
+    st.write("---")
+    st.write("Ask another question:")
+    additional_input = st.text_input("Your question:", key="additional_input")
+    if additional_input:
+        st.session_state['chat_history'].append({"role": "user", "content": additional_input})
+        response = chain.invoke({"question": additional_input})
+        st.session_state['chat_history'].append({"role": "assistant", "content": response})
+        st.experimental_rerun()
+
+# Display the chat history in the sidebar
+st.sidebar.title("Chat History")
+for message in st.session_state['chat_history']:
+    if message['role'] == "user":
+        st.sidebar.write(f"**User:** {message['content']}")
+    else:
+        st.sidebar.write(f"**Assistant:** {message['content']}")
