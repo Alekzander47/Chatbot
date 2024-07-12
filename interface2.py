@@ -107,16 +107,40 @@ for message in st.session_state['chat_history']:
         st.write(f"**Assistant:** {message['content']}")
 
 # Provide an additional prompt for the user to continue the conversation
+# Provide an additional prompt for the user to continue the conversation
 if response:
     st.write("---")
-    st.write("Ask another question:")
+    st.write("Ask another question and optionally upload documents for a document-based answer:")
     additional_input = st.text_input("Your question:", key="additional_input")
+    additional_uploaded_files = st.file_uploader("Upload documents for this question", accept_multiple_files=True, key="additional_files")
+    
     if additional_input:
-        st.session_state['chat_history'].append({"role": "user", "content": additional_input})
-        response = chain.invoke({"question": additional_input})
-        st.session_state['chat_history'].append({"role": "assistant", "content": response})
-        st.experimental_rerun()
+        additional_documents = []
+        if additional_uploaded_files:
+            with tempfile.TemporaryDirectory() as temp_dir:
+                # Save uploaded files to the temp directory
+                for uploaded_file in additional_uploaded_files:
+                    with open(os.path.join(temp_dir, uploaded_file.name), "wb") as f:
+                        f.write(uploaded_file.getbuffer())
+                
+                # Load documents from the temp directory
+                additional_documents = SimpleDirectoryReader(temp_dir).load_data()
+                
+                # Perform RAG query with the additional documents
+                document_response = perform_rag_query(additional_documents, additional_input)
+                response = f"Document-Based Answer:\n{document_response}\n\nModel-Based Answer:\n"
+        else:
+            response = "Model-Based Answer:\n"
+        
+        # Get model response
+        model_response = chain.invoke({"question": additional_input})
+        response += model_response
 
+        # Append the user input and model response to the chat history
+        st.session_state['chat_history'].append({"role": "user", "content": additional_input})
+        st.session_state['chat_history'].append({"role": "assistant", "content": response})
+        
+        st.experimental_rerun()
 # Display the chat history in the sidebar
 st.sidebar.title("Chat History")
 for message in st.session_state['chat_history']:
