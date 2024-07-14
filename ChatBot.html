@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot Frontend</title>
+    <style>
+        /* Global styles */
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 20px;
+            background-color: #343a40;
+            color: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .header .left, .header .right {
+            display: flex;
+            align-items: center;
+        }
+        .content {
+            display: flex;
+            flex: 1;
+        }
+        /* Sidebar styles */
+        .sidebar {
+            width: 250px;
+            background-color: #ffffff;
+            padding: 20px;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+        }
+        .sidebar .new-chat {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .sidebar .new-chat button {
+            background-color: #555656;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .sidebar .new-chat button:hover {
+            background-color: #17a2b8;
+        }
+        .sidebar .chat-history {
+            flex: 1;
+            overflow-y: auto;
+            max-height: calc(100vh - 150px);
+            padding-right: 5px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .sidebar .chat-history .chat-item {
+            padding: 10px;
+            margin-bottom: 10px;
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .sidebar .chat-history .chat-item button {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .sidebar .chat-history .chat-item button:hover {
+            background-color: #c82333;
+        }
+        /* Main content styles */
+        .main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            background-color: #e9ecef;
+            padding: 20px;
+        }
+        .main h2 {
+            font-size: 2.5em;
+            color: #000000;
+            margin-bottom: 20px;
+        }
+        .question-box {
+            position: absolute;
+            bottom: 20px;
+            width: 80%;
+            padding: 15px;
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+            background-color: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+        }
+        .question-box input {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            outline: none;
+        }
+        .question-box button,
+        .attach-btn {
+            background-color: #626262;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .question-box button:hover,
+        .attach-btn:hover {
+            background-color: #17a2b8;
+        }
+        .attach-btn {
+            margin-right: 10px;
+            display: flex;
+            align-items: center;
+        }
+        .attach-btn svg {
+            width: 20px;
+            height: 20px;
+            fill: white;
+        }
+        /* Login and Signup page styles */
+        .login-page, .signup-page {
+            display: none; /* Initially hidden */
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            padding: 20px;
+            background-color: white;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            border: 1px solid #dee2e6;
+            max-width: 400px;
+            margin: 0 auto;
+            position: relative;
+            top: 20px;
+        }
+        .login-page input, .signup-page input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+        }
+        .login-page button, .signup-page button {
+            background-color: #626262;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .login-page button:hover, .signup-page button:hover {
+            background-color: #17a2b8;
+        }
+        .signup-page button {
+            background-color: #28a745; /* Green color for Sign Up button */
+        }
+        .signup-page button:hover {
+            background-color: #218838;
+        }
+        .login-page .google-login, .signup-page .google-login {
+            background-color: #dc3545; /* Red color for Google login button */
+        }
+        .login-page .google-login:hover, .signup-page .google-login:hover {
+            background-color: #c82333;
+        }
+        label {
+            align-self: flex-start;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .gender-label {
+            margin-bottom: 10px;
+            display: inline-flex;
+            align-items: left;
+            margin-right: 70px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header section -->
+    <div class="header">
+        <div class="left">
+            <span id="profile">Profile</span> <!-- Placeholder for user profile -->
+        </div>
+        <div class="right">
+            <span id="auth-action" onclick="toggleLogin()">Login/Sign up</span> <!-- Toggle between login and signup pages -->
+        </div>
+    </div>
+    <!-- Main content section -->
+    <div class="content" id="content">
+        <!-- Sidebar section -->
+        <div class="sidebar">
+            <!-- Chat history section -->
+            <div class="chat-history" id="chat-history">
+                <!-- New chat button -->
+                <div class="new-chat">
+                    <button onclick="startNewChat()">New Chat</button>
+                </div>
+                <!-- Chat items section -->
+                <div class="chat-item">
+                    Chat 1 <!-- Placeholder for chat item -->
+                    <button onclick="deleteChat(this)">Delete</button> <!-- Delete button for chat item -->
+                </div>
+            </div>
+        </div>
+        <!-- Main section -->
+        <div class="main">
+            <h2>Welcome to the Chatbot</h2>
+            <!-- Question submission box -->
+            <div class="question-box">
+                <button class="attach-btn" onclick="document.getElementById('file-input').click();">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2C10.89 2 10.01 2.89 10.01 4L10 16.59L6.41 20.17C5.97 20.61 5.78 21.23 5.9 21.85C6.02 22.47 6.43 23 7 23H16C17.1 23 18 22.1 18 21V8C18 6.9 17.1 6 16 6H11.41L14.83 2.59C15.27 2.25 15.94 2.35 16.28 2.79C16.62 3.23 16.52 3.9 16.08 4.24L12 8.34L14 10H16C17.1 10 18 10.9 18 12V20H6.41L10 16.59V4C10 2.89 10.89 2 12 2Z"/></svg>
+                </button>
+                <input type="file" id="file-input" style="display:none;" onchange="handleFileUpload(event)">
+                <input type="text" id="question-input" placeholder="Enter question here">
+                <button onclick="submitQuestion()">Submit</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Login page section -->
+    <div class="login-page" id="login-page">
+        <h2>Login</h2>
+        <input type="text" placeholder="Enter Mail ID or Mobile No." id="email-input">
+        <input type="password" placeholder="Enter Password" id="password-input">
+        <button onclick="login()">Login</button>
+        <button class="google-login" onclick="googleLogin()">Login with Google</button>
+        <p>Don't have an account? <a href="#" onclick="toggleSignup()">Sign up?</a></p>
+    </div>
+
+    <!-- Signup page section -->
+    <div class="signup-page" id="signup-page">
+        <h2>Sign Up</h2>
+        <label for="signup-name-input">Name</label>
+        <input type="text" placeholder="Enter Name" id="signup-name-input" required>
+        <label for="signup-email-input">Mail ID</label>
+        <input type="text" placeholder="Enter Mail ID" id="signup-email-input" required>
+        <label for="signup-password-input">Password</label>
+        <input type="password" placeholder="Enter Password" id="signup-password-input" required>
+        <label for="signup-confirm-password-input">Confirm Password</label>
+        <input type="password" placeholder="Confirm Password" id="signup-confirm-password-input" required>
+        <label for="signup-dob-input">Date of Birth</label>
+        <input type="date" id="signup-dob-input" required>
+        <label for="signup-mobile-input">Mobile No. (optional)</label>
+        <input type="text" placeholder="Enter Mobile No." id="signup-mobile-input">
+
+        <label>Gender</label>
+        <div>
+            <label class="gender-label">
+                <input type="radio" name="gender" value="male" id="signup-gender-male" required> Male
+            </label>
+            <label class="gender-label">
+                <input type="radio" name="gender" value="female" id="signup-gender-female"> Female
+            </label>
+            <label class="gender-label">
+                <input type="radio" name="gender" value="others" id="signup-gender-others"> Others
+            </label>
+        </div>
+
+        <button onclick="signup()">Sign Up</button>
+        <button class="google-login" onclick="googleLogin()">Sign Up with Google</button>
+        <p>Already have an account? <a href="#" onclick="toggleLogin()">Login?</a></p>
+    </div>
+
+
+    <!-- JavaScript section -->
+    <script>
+        let chatCount = 1;
+        let loginVisible = false;
+        let signupVisible = false;
+
+        function startNewChat() {
+            chatCount++;
+            const chatHistory = document.getElementById('chat-history');
+            const chatItem = document.createElement('div');
+            chatItem.className = 'chat-item';
+            chatItem.innerHTML = `Chat ${chatCount} <button onclick="deleteChat(this)">Delete</button>`;
+            chatHistory.appendChild(chatItem);
+        }
+
+        function deleteChat(button) {
+            const chatItem = button.parentNode;
+            chatItem.parentNode.removeChild(chatItem);
+            chatCount--;
+        }
+
+        function submitQuestion() {
+            const input = document.getElementById('question-input');
+            const question = input.value.trim();
+            if (question !== "") {
+                const chatHistory = document.getElementById('chat-history');
+                const chatItems = chatHistory.getElementsByClassName('chat-item');
+                if (chatItems.length > 0) {
+                    chatItems[chatItems.length - 1].innerHTML = `${question.substring(0, 15)}... <button onclick="deleteChat(this)">Delete</button>`;
+                }
+                input.value = "";
+            }
+        }
+
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const chatHistory = document.getElementById('chat-history');
+                const chatItem = document.createElement('div');
+                chatItem.className = 'chat-item';
+                chatItem.innerHTML = `File Attached: ${file.name} <button onclick="deleteChat(this)">Delete</button>`;
+                chatHistory.appendChild(chatItem);
+            }
+        }
+
+        function toggleLogin() {
+            const loginPage = document.getElementById('login-page');
+            const signupPage = document.getElementById('signup-page');
+            const content = document.getElementById('content');
+            loginVisible = !loginVisible;
+            signupVisible = false;
+            loginPage.style.display = loginVisible ? 'flex' : 'none';
+            signupPage.style.display = 'none';
+            content.style.display = loginVisible ? 'none' : 'flex';
+        }
+
+        function toggleSignup() {
+            const loginPage = document.getElementById('login-page');
+            const signupPage = document.getElementById('signup-page');
+            const content = document.getElementById('content');
+            signupVisible = !signupVisible;
+            loginVisible = false;
+            loginPage.style.display = 'none';
+            signupPage.style.display = signupVisible ? 'flex' : 'none';
+            content.style.display = signupVisible ? 'none' : 'flex';
+        }
+
+        function login() {
+            const email = document.getElementById('email-input').value;
+            const password = document.getElementById('password-input').value;
+            console.log('Login with:', email, password);
+            // Implement actual login logic here
+        }
+
+        function signup() {
+            const name = document.getElementById('signup-name-input').value;
+            const email = document.getElementById('signup-email-input').value;
+            const password = document.getElementById('signup-password-input').value;
+            const confirmPassword = document.getElementById('signup-confirm-password-input').value;
+            const dob = document.getElementById('signup-dob-input').value;
+            const mobile = document.getElementById('signup-mobile-input').value;
+            const gender = document.querySelector('input[name="gender"]:checked').value;
+            console.log('Sign up with:', name, email, password, confirmPassword, dob, mobile, gender);
+            // Implement actual signup logic here
+        }
+
+        function googleLogin() {
+            console.log('Login with Google');
+            // Implement Google login logic here
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const loggedIn = false; // Change this to actual login check
+            const authAction = document.getElementById('auth-action');
+            const profile = document.getElementById('profile');
+
+            if (loggedIn) {
+                authAction.textContent = 'Sign out';
+                profile.style.display = 'block';
+            } else {
+                authAction.textContent = 'Login/Sign up';
+                profile.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
