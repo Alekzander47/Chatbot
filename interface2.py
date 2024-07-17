@@ -16,7 +16,7 @@ if 'chat_history' not in st.session_state:
 prompt = ChatPromptTemplate.from_messages(
     [
         ("system", "You are a helpful assistant. Please respond to the questions."),
-        ("user", "Question:{question}")
+        ("user", "Question: {question}\n\nContext: {context}")
     ]
 )
 
@@ -27,7 +27,7 @@ llm = Ollama(model="llama3")
 chain = prompt | llm
 
 # Set up the Streamlit framework
-st.title('Ask any questions  if related to document <-_->')  # Set the title of the Streamlit app
+st.title('Ask any questions if related to document')  # Set the title of the Streamlit app
 
 # File uploader for documents
 uploaded_files = st.file_uploader("Upload documents", accept_multiple_files=True)
@@ -52,9 +52,9 @@ def perform_rag_query(documents, query):
     # Find similar documents
     similar_docs = find_similar_documents(query, documents, doc_embeddings)
     
-    # Combine the content of similar documents into a single response
-    response = "\n\n".join([doc.text for doc in similar_docs])
-    return response
+    # Combine the content of similar documents into a single context
+    context = "\n\n".join([doc.text for doc in similar_docs])
+    return context
 
 documents = []
 response = ""
@@ -70,25 +70,17 @@ if uploaded_files:
         
         # Load documents from the temp directory
         documents = SimpleDirectoryReader(temp_dir).load_data()
-        
-        if input_text:
-            # Perform RAG query
-            response = perform_rag_query(documents, input_text)
 
 if input_text:
     try:
+        context = ""
         # Perform RAG query if documents are uploaded
         if documents:
-            document_response = perform_rag_query(documents, input_text)
-            final_response = f"Document-Based Answer:\n{document_response}\n\nModel-Based Answer:\n"
-        else:
-            final_response = "Model-Based Answer:\n"
+            context = perform_rag_query(documents, input_text)
         
         # Get model response
-        model_response = chain.invoke({"question": input_text})
-        final_response += model_response
-
-        response = final_response
+        model_response = chain.invoke({"question": input_text, "context": context})
+        response = model_response
 
         # Append the user input and model response to the chat history
         st.session_state['chat_history'].append({"role": "user", "content": input_text})
@@ -106,7 +98,6 @@ for message in st.session_state['chat_history']:
     else:
         st.write(f"**Assistant:** {message['content']}")
 
-# Provide an additional prompt for the user to continue the conversation
 # Provide an additional prompt for the user to continue the conversation
 if response:
     st.write("---")
@@ -127,20 +118,20 @@ if response:
                 additional_documents = SimpleDirectoryReader(temp_dir).load_data()
                 
                 # Perform RAG query with the additional documents
-                document_response = perform_rag_query(additional_documents, additional_input)
-                response = f"Document-Based Answer:\n{document_response}\n\nModel-Based Answer:\n"
+                context = perform_rag_query(additional_documents, additional_input)
         else:
-            response = "Model-Based Answer:\n"
+            context = ""
         
         # Get model response
-        model_response = chain.invoke({"question": additional_input})
-        response += model_response
+        model_response = chain.invoke({"question": additional_input, "context": context})
+        response = model_response
 
         # Append the user input and model response to the chat history
         st.session_state['chat_history'].append({"role": "user", "content": additional_input})
         st.session_state['chat_history'].append({"role": "assistant", "content": response})
         
         st.experimental_rerun()
+
 # Display the chat history in the sidebar
 st.sidebar.title("Chat History")
 for message in st.session_state['chat_history']:
