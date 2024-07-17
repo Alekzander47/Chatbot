@@ -1,12 +1,133 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdn.tailwindcss.com?plugins=forms,container-queries">
+  <title>ChatGPT Interface</title>
 </head>
-<body>
-    <h2> This is home page</h2>
-    
+<body class="bg-gray-100">
+  <div class="flex flex-col min-h-screen">
+    <header class="flex items-center justify-between p-4 bg-white shadow-md">
+      <div class="flex items-center gap-4">
+        <div class="text-2xl font-bold text-gray-900">TalkAI</div>
+      </div>
+      <div class="flex items-center gap-4">
+        <a href="#" class="text-sm font-medium text-gray-600">Dashboard</a>
+        <a href="#" class="text-sm font-medium text-gray-600">Messages</a>
+        <a href="#" class="text-sm font-medium text-gray-600">My AI</a>
+        <a href="#" class="text-sm font-medium text-gray-600">Explore</a>
+        <div class="w-10 h-10 bg-center bg-cover rounded-full" style='background-image: url("https://cdn.usegalileo.ai/sdxl10/f03a386d-7fd4-43cc-b7fd-780bd68eac60.png");'></div>
+      </div>
+    </header>
+    <div class="flex flex-1 overflow-hidden">
+      <aside class="hidden md:flex flex-col w-64 bg-white border-r p-4">
+        <div class="flex items-center gap-4 mb-6">
+          <div class="w-10 h-10 bg-center bg-cover rounded-full" style='background-image: url("https://cdn.usegalileo.ai/stability/a9a9b74b-d0be-4666-8e6a-73dea30953af.png");'></div>
+          <div>
+            <h2 class="text-lg font-medium text-gray-900">Bob Kramer</h2>
+            <p class="text-sm text-gray-500">bobkramer@gmail.com</p>
+          </div>
+        </div>
+        <button class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-600 bg-gray-200 rounded-lg">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+          </svg>
+          New Chat
+        </button>
+        <ul class="mt-4 space-y-2">
+          <li class="px-4 py-2 text-sm font-medium text-gray-600 bg-gray-100 rounded-lg">Chat history 1</li>
+          <li class="px-4 py-2 text-sm font-medium text-gray-600 bg-gray-100 rounded-lg">Chat history 2</li>
+          <li class="px-4 py-2 text-sm font-medium text-gray-600 bg-gray-100 rounded-lg">Chat history 3</li>
+          <li class="px-4 py-2 text-sm font-medium text-gray-600 bg-gray-100 rounded-lg">Chat history 4</li>
+        </ul>
+      </aside>
+      <main class="flex flex-1 flex-col bg-white">
+        <div class="flex-1 p-4 overflow-y-auto" id="chatContainer">
+          <div class="flex flex-col-reverse">
+            <div class="flex items-start gap-4 mb-4">
+              <div class="w-10 h-10 bg-center bg-cover rounded-full" style='background-image: url("https://cdn.usegalileo.ai/sdxl10/ae4b98f4-a12d-4e5b-98c0-129018d37026.png");'></div>
+              <div>
+                <div class="px-4 py-2 bg-gray-200 rounded-lg">
+                  <p class="text-gray-900">ChatGPT</p>
+                  <p>Brainstorm 5 episode ideas for my new podcast on urban design.</p>
+                </div>
+                <p class="text-xs text-gray-500 mt-1">12:00 PM</p>
+              </div>
+            </div>
+            <div class="flex items-start gap-4 mb-4">
+              <div class="w-10 h-10 bg-center bg-cover rounded-full" style='background-image: url("https://cdn.usegalileo.ai/stability/276faff0-18be-45fb-849c-4a3f8a71a357.png");'></div>
+              <div>
+                <div class="px-4 py-2 bg-blue-500 text-white rounded-lg">
+                  <p class="text-white">You</p>
+                  <p>
+                    1. The history and future of urban design in New York City. 2. How urban design can impact the well-being of city residents. 3. A deep dive into the architecture
+                    and layout of a famous city district. 4. The role of green spaces in modern urban design. 5. An interview with a local urban designer about their latest project.
+                  </p>
+                </div>
+                <p class="text-xs text-gray-500 mt-1">12:00 PM</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="flex items-center p-4 border-t">
+          <form id="chatForm" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <label class="flex items-center px-4 py-2 bg-gray-200 text-gray-600 cursor-pointer rounded-l-lg">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v-4a4 4 0 014-4h1m0 0h6a4 4 0 014 4v4m-4 4h-4a4 4 0 01-4-4m0-4h4" />
+              </svg>
+              <input type="file" name="documents" class="hidden" multiple />
+            </label>
+            <input
+              type="text"
+              name="input_text"
+              placeholder="Type your message..."
+              class="flex-1 px-4 py-2 border-t border-b border-r rounded-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            <button type="submit" class="px-4 py-2 text-white bg-blue-500 rounded-r-lg">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+              </svg>
+            </button>
+          </form>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('chatForm').addEventListener('submit', function (event) {
+      event.preventDefault();
+
+      const formData = new FormData(this);
+      fetch('{% url 'ask_question' %}', {
+        method: 'POST',
+        body: formData,
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.response) {
+          // Add the new message to the chat container
+          const chatContainer = document.getElementById('chatContainer');
+          const newMessage = document.createElement('div');
+          newMessage.className = 'flex items-start gap-4 mb-4';
+          newMessage.innerHTML = `
+            <div class="w-10 h-10 bg-center bg-cover rounded-full" style='background-image: url("https://cdn.usegalileo.ai/sdxl10/ae4b98f4-a12d-4e5b-98c0-129018d37026.png");'></div>
+            <div>
+              <div class="px-4 py-2 bg-gray-200 rounded-lg">
+                <p class="text-gray-900">ChatGPT</p>
+                <p>${data.response}</p>
+              </div>
+              <p class="text-xs text-gray-500 mt-1">12:00 PM</p>
+            </div>
+          `;
+          chatContainer.insertBefore(newMessage, chatContainer.firstChild);
+        }
+      });
+    });
+  </script>
 </body>
 </html>
+    
