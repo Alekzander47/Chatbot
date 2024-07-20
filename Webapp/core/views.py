@@ -1,39 +1,25 @@
+import os
+import json
+import numpy as np
 from django.shortcuts import render
 from django.http import JsonResponse
+from django.conf import settings
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_community.llms import Ollama
-from llama_index.core import VectorStoreIndex, SimpleDirectoryReader
+from llama_index.core import SimpleDirectoryReader, Document
 from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
-import numpy as np
-import os
-import tempfile
 
-# Create your views here.
-def index(request):
-    return render(request, 'admin/index.html')
-
-def login(request):
-    return render(request, 'admin/login.html')
-
-def signup(request):
-    return render(request, 'admin/signup.html')
-
-
-# Initialize the sentence transformer model
-embedding_model = SentenceTransformer('sentence-transformers/paraphrase-MiniLM-L6-v2')
-
-# Define a prompt template for the chatbot
-prompt = ChatPromptTemplate.from_messages([
-    ("system", "You are a helpful assistant. Please respond to the questions."),
-    ("user", "Question: {question}\n\nContext: {context}")
-])
-
-# Initialize the Ollama model
+# Define the prompt and model
+prompt = ChatPromptTemplate.from_messages(
+    [
+        ("system", "You are a helpful assistant. Please respond to the questions."),
+        ("user", "Question: {question}\n\nContext: {context}")
+    ]
+)
 llm = Ollama(model="llama3")
-
-# Create a chain that combines the prompt and the Ollama model
 chain = prompt | llm
+embedding_model = SentenceTransformer('sentence-transformers/paraphrase-MiniLM-L6-v2')
 
 def get_document_embeddings(documents):
     embeddings = embedding_model.encode([document.text for document in documents])
@@ -43,46 +29,58 @@ def find_similar_documents(query, documents, doc_embeddings):
     query_embedding = embedding_model.encode([query]).reshape(1, -1)
     similarities = cosine_similarity(query_embedding, doc_embeddings).flatten()
     ranked_indices = similarities.argsort()[::-1]
-    return [documents[i] for i in ranked_indices[:5]]  # Retrieve top 5 documents
+    return [documents[i] for i in ranked_indices[:5]]
 
 def perform_rag_query(documents, query):
-    # Get document embeddings
+    if not documents:
+        return ""
     doc_embeddings = get_document_embeddings(documents)
-    
-    # Find similar documents
     similar_docs = find_similar_documents(query, documents, doc_embeddings)
-    
-    # Combine the content of similar documents into a single context
     context = "\n\n".join([doc.text for doc in similar_docs])
     return context
 
-
-def ask_question(request):
-    response_data = {'response': ''}
+def index(request):
     if request.method == 'POST':
-        input_text = request.POST.get('input_text', '')
-        documents = []
-
-        if request.FILES:
-            with tempfile.TemporaryDirectory() as temp_dir:
-                for uploaded_file in request.FILES.getlist('documents'):
-                    file_path = os.path.join(temp_dir, uploaded_file.name)
-                    with open(file_path, 'wb') as f:
-                        for chunk in uploaded_file.chunks():
-                            f.write(chunk)
-                
+        try:
+            documents = []
+            temp_dir = os.path.join(settings.MEDIA_ROOT, 'temp_uploaded_files')
+            if os.path.exists(temp_dir) and os.listdir(temp_dir):
                 documents = SimpleDirectoryReader(temp_dir).load_data()
 
-        if input_text:
-            try:
-                context = ""
-                if documents:
-                    context = perform_rag_query(documents, input_text)
+            data = json.loads(request.body)
+            message = data.get('message', '')
 
-                model_response = chain.invoke({"question": input_text, "context": context})
-                response_data['response'] = model_response
+            context = perform_rag_query(documents, message) if documents else ""
 
-            except Exception as e:
-                response_data['error'] = str(e)
+            response = chain.invoke({"question": message, "context": context})
 
-    return JsonResponse(response_data)
+            return JsonResponse({'response': response})
+        except Exception as e:
+            return JsonResponse({'response': f'An error occurred: {e}'}, status=500)
+    return render(request, 'admin/index.html')
+
+def upload_files(request):
+    if request.method == 'POST':
+        try:
+            uploaded_files = request.FILES.getlist('uploaded_files')
+            temp_dir = os.path.join(settings.MEDIA_ROOT, 'temp_uploaded_files')
+
+            # Create the temporary directory if it doesn't exist
+            os.makedirs(temp_dir, exist_ok=True)
+
+            for uploaded_file in uploaded_files:
+                file_path = os.path.join(temp_dir, uploaded_file.name)
+                with open(file_path, 'wb') as f:
+                    for chunk in uploaded_file.chunks():
+                        f.write(chunk)
+            
+            return JsonResponse({'status': 'success', 'message': 'Files uploaded successfully'})
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': f'File upload failed: {e}'}, status=500)
+    return JsonResponse({'status': 'error', 'message': 'Invalid request method'}, status=405)
+
+def login(request):
+    return render(request, 'admin/login.html')
+
+def signup(request):
+    return render(request, 'admin/signup.html')
