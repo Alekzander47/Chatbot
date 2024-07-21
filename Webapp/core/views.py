@@ -1,14 +1,16 @@
-import os
-import json
-import numpy as np
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from django.conf import settings
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth import authenticate, login, logout
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_community.llms import Ollama
 from llama_index.core import SimpleDirectoryReader, Document
 from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
+import os
+import json
+import numpy as np
 
 # Define the prompt and model
 prompt = ChatPromptTemplate.from_messages(
@@ -39,7 +41,15 @@ def perform_rag_query(documents, query):
     context = "\n\n".join([doc.text for doc in similar_docs])
     return context
 
+from allauth.socialaccount.models import SocialAccount
+
+@login_required
 def index(request):
+    profile_picture_url = None
+    social_account = SocialAccount.objects.filter(user=request.user, provider='google').first()
+    if social_account:
+        profile_picture_url = social_account.extra_data.get('picture')
+
     if request.method == 'POST':
         try:
             documents = []
@@ -57,7 +67,11 @@ def index(request):
             return JsonResponse({'response': response})
         except Exception as e:
             return JsonResponse({'response': f'An error occurred: {e}'}, status=500)
-    return render(request, 'admin/index.html')
+    
+    context = {
+        'profile_picture_url': profile_picture_url
+    }
+    return render(request, 'admin_view/index.html', context)
 
 def upload_files(request):
     if request.method == 'POST':
@@ -79,8 +93,9 @@ def upload_files(request):
             return JsonResponse({'status': 'error', 'message': f'File upload failed: {e}'}, status=500)
     return JsonResponse({'status': 'error', 'message': 'Invalid request method'}, status=405)
 
-def login(request):
-    return render(request, 'admin/login.html')
+def logout_view(request):
+    logout(request)
+    return redirect('/')
 
 def signup(request):
-    return render(request, 'admin/signup.html')
+    return render(request, 'account/signup.html')

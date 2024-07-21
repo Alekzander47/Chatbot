@@ -1,183 +1,357 @@
-@import url('https://fonts.googleapis.com/css?family=Poppins:400,500,600,700&display=swap');
-*{
-  margin: 0;
-  padding: 0;
-  outline: none;
-  font-family: 'Poppins', sans-serif;
+/* Importing Google font - Open Sans */
+@import url("https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700&display=swap");
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Open Sans", sans-serif;
 }
-body{
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 100vh;
-  overflow: hidden;
-  background: url("bg.png"), -webkit-linear-gradient(bottom, #0250c5, #d43f8d);
+
+body {
+    height: 100vh;
+    width: 100%;
+    background: url("images/hero-bg.jpg") center/cover no-repeat;
 }
-::selection{
-  color: #fff;
-  background: #d43f8d;
+
+header {
+    position: fixed;
+    width: 100%;
+    top: 0;
+    left: 0;
+    z-index: 10;
+    padding: 0 10px;
 }
-.container{
-  width: 330px;
-  background: #fff;
-  text-align: center;
-  border-radius: 5px;
-  padding: 50px 35px 10px 35px;
+
+.navbar {
+    display: flex;
+    padding: 22px 0;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+    justify-content: space-between;
 }
-.container header{
-  font-size: 35px;
-  font-weight: 600;
-  margin: 0 0 30px 0;
+
+.navbar .hamburger-btn {
+    display: none;
+    color: #fff;
+    cursor: pointer;
+    font-size: 1.5rem;
 }
-.container .form-outer{
-  width: 100%;
-  overflow: hidden;
+
+.navbar .logo {
+    gap: 10px;
+    display: flex;
+    align-items: center;
+    text-decoration: none;
 }
-.container .form-outer form{
-  display: flex;
-  width: 400%;
+
+.navbar .logo img {
+    width: 40px;
+    border-radius: 50%;
 }
-.form-outer form .page{
-  width: 25%;
-  transition: margin-left 0.3s ease-in-out;
+
+.navbar .logo h2 {
+    color: #fff;
+    font-weight: 600;
+    font-size: 1.7rem;
 }
-.form-outer form .page .title{
-  text-align: left;
-  font-size: 25px;
-  font-weight: 500;
+
+.navbar .links {
+    display: flex;
+    gap: 35px;
+    list-style: none;
+    align-items: center;
 }
-.form-outer form .page .field{
-  width: 330px;
-  height: 45px;
-  margin: 45px 0;
-  display: flex;
-  position: relative;
+
+.navbar .close-btn {
+    position: absolute;
+    right: 20px;
+    top: 20px;
+    display: none;
+    color: #000;
+    cursor: pointer;
 }
-form .page .field .label{
-  position: absolute;
-  top: -30px;
-  font-weight: 500;
+
+.navbar .links a {
+    color: #fff;
+    font-size: 1.1rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: 0.1s ease;
 }
-form .page .field input{
-  height: 100%;
-  width: 100%;
-  border: 1px solid lightgrey;
-  border-radius: 5px;
-  padding-left: 15px;
-  font-size: 18px;
+
+.navbar .links a:hover {
+    color: #19e8ff;
 }
-form .page .field select{
-  width: 100%;
-  padding-left: 10px;
-  font-size: 17px;
-  font-weight: 500;
+
+.navbar .login-btn {
+    border: none;
+    outline: none;
+    background: #fff;
+    color: #275360;
+    font-size: 1rem;
+    font-weight: 600;
+    padding: 10px 18px;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: 0.15s ease;
 }
-form .page .field button{
-  width: 100%;
-  height: calc(100% + 5px);
-  border: none;
-  background: #d33f8d;
-  margin-top: -20px;
-  border-radius: 5px;
-  color: #fff;
-  cursor: pointer;
-  font-size: 18px;
-  font-weight: 500;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  transition: 0.5s ease;
+
+.navbar .login-btn:hover {
+    background: #ddd;
 }
-form .page .field button:hover{
-  background: #000;
+
+.form-popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    z-index: 10;
+    width: 100%;
+    opacity: 0;
+    pointer-events: none;
+    max-width: 720px;
+    background: #fff;
+    border: 2px solid #fff;
+    transform: translate(-50%, -70%);
 }
-form .page .btns button{
-  margin-top: -20px!important;
+
+.show-popup .form-popup {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translate(-50%, -50%);
+    transition: transform 0.3s ease, opacity 0.1s;
 }
-form .page .btns button.prev{
-  margin-right: 3px;
-  font-size: 17px;
+
+.form-popup .close-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    color: #878484;
+    cursor: pointer;
 }
-form .page .btns button.next{
-  margin-left: 3px;
+
+.blur-bg-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 10;
+    height: 100%;
+    width: 100%;
+    opacity: 0;
+    pointer-events: none;
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    transition: 0.1s ease;
 }
-.container .progress-bar{
-  display: flex;
-  margin: 40px 0;
-  user-select: none;
+
+.show-popup .blur-bg-overlay {
+    opacity: 1;
+    pointer-events: auto;
 }
-.container .progress-bar .step{
-  text-align: center;
-  width: 100%;
-  position: relative;
+
+.form-popup .form-box {
+    display: flex;
 }
-.container .progress-bar .step p{
-  font-weight: 500;
-  font-size: 18px;
-  color: #000;
-  margin-bottom: 8px;
+
+.form-box .form-details {
+    width: 100%;
+    color: #fff;
+    max-width: 330px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
-.progress-bar .step .bullet{
-  height: 25px;
-  width: 25px;
-  border: 2px solid #000;
-  display: inline-block;
-  border-radius: 50%;
-  position: relative;
-  transition: 0.2s;
-  font-weight: 500;
-  font-size: 17px;
-  line-height: 25px;
+
+.login .form-details {
+    padding: 0 40px;
+    background: url("images/login-img.jpg");
+    background-position: center;
+    background-size: cover;
 }
-.progress-bar .step .bullet.active{
-  border-color: #d43f8d;
-  background: #d43f8d;
+
+.signup .form-details {
+    padding: 0 20px;
+    background: url("images/signup-img.jpg");
+    background-position: center;
+    background-size: cover;
 }
-.progress-bar .step .bullet span{
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
+
+.form-box .form-content {
+    width: 100%;
+    padding: 35px;
 }
-.progress-bar .step .bullet.active span{
-  display: none;
+
+.form-box h2 {
+    text-align: center;
+    margin-bottom: 29px;
 }
-.progress-bar .step .bullet:before,
-.progress-bar .step .bullet:after{
-  position: absolute;
-  content: '';
-  bottom: 11px;
-  right: -51px;
-  height: 3px;
-  width: 44px;
-  background: #262626;
+
+form .input-field {
+    position: relative;
+    height: 50px;
+    width: 100%;
+    margin-top: 20px;
 }
-.progress-bar .step .bullet.active:after{
-  background: #d43f8d;
-  transform: scaleX(0);
-  transform-origin: left;
-  animation: animate 0.3s linear forwards;
+
+.input-field input {
+    height: 100%;
+    width: 100%;
+    background: none;
+    outline: none;
+    font-size: 0.95rem;
+    padding: 0 15px;
+    border: 1px solid #717171;
+    border-radius: 3px;
 }
-@keyframes animate {
-  100%{
-    transform: scaleX(1);
-  }
+
+.input-field input:focus {
+    border: 1px solid #00bcd4;
 }
-.progress-bar .step:last-child .bullet:before,
-.progress-bar .step:last-child .bullet:after{
-  display: none;
+
+.input-field label {
+    position: absolute;
+    top: 50%;
+    left: 15px;
+    transform: translateY(-50%);
+    color: #4a4646;
+    pointer-events: none;
+    transition: 0.2s ease;
 }
-.progress-bar .step p.active{
-  color: #d43f8d;
-  transition: 0.2s linear;
+
+.input-field input:is(:focus, :valid) {
+    padding: 16px 15px 0;
 }
-.progress-bar .step .check{
-  position: absolute;
-  left: 50%;
-  top: 70%;
-  font-size: 15px;
-  transform: translate(-50%, -50%);
-  display: none;
+
+.input-field input:is(:focus, :valid)~label {
+    transform: translateY(-120%);
+    color: #00bcd4;
+    font-size: 0.75rem;
 }
-.progress-bar .step .check.active{
-  display: block;
-  color: #fff;
+
+.form-box a {
+    color: #00bcd4;
+    text-decoration: none;
+}
+
+.form-box a:hover {
+    text-decoration: underline;
+}
+
+form :where(.forgot-pass-link, .policy-text) {
+    display: inline-flex;
+    margin-top: 13px;
+    font-size: 0.95rem;
+}
+
+form button {
+    width: 100%;
+    color: #fff;
+    border: none;
+    outline: none;
+    padding: 14px 0;
+    font-size: 1rem;
+    font-weight: 500;
+    border-radius: 3px;
+    cursor: pointer;
+    margin: 25px 0;
+    background: #00bcd4;
+    transition: 0.2s ease;
+}
+
+form button:hover {
+    background: #0097a7;
+}
+
+.form-content .bottom-link {
+    text-align: center;
+}
+
+.form-popup .signup,
+.form-popup.show-signup .login {
+    display: none;
+}
+
+.form-popup.show-signup .signup {
+    display: flex;
+}
+
+.signup .policy-text {
+    display: flex;
+    margin-top: 14px;
+    align-items: center;
+}
+
+.signup .policy-text input {
+    width: 14px;
+    height: 14px;
+    margin-right: 7px;
+}
+
+@media (max-width: 950px) {
+    .navbar :is(.hamburger-btn, .close-btn) {
+        display: block;
+    }
+
+    .navbar {
+        padding: 15px 0;
+    }
+
+    .navbar .logo img {
+        display: none;
+    }
+
+    .navbar .logo h2 {
+        font-size: 1.4rem;
+    }
+
+    .navbar .links {
+        position: fixed;
+        top: 0;
+        z-index: 10;
+        left: -100%;
+        display: block;
+        height: 100vh;
+        width: 100%;
+        padding-top: 60px;
+        text-align: center;
+        background: #fff;
+        transition: 0.2s ease;
+    }
+
+    .navbar .links.show-menu {
+        left: 0;
+    }
+
+    .navbar .links a {
+        display: inline-flex;
+        margin: 20px 0;
+        font-size: 1.2rem;
+        color: #000;
+    }
+
+    .navbar .links a:hover {
+        color: #00BCD4;
+    }
+
+    .navbar .login-btn {
+        font-size: 0.9rem;
+        padding: 7px 10px;
+    }
+}
+
+@media (max-width: 760px) {
+    .form-popup {
+        width: 95%;
+    }
+
+    .form-box .form-details {
+        display: none;
+    }
+
+    .form-box .form-content {
+        padding: 30px 20px;
+    }
 }

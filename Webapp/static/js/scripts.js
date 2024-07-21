@@ -51,7 +51,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 userBubbleContainer.classList.add('bubble-container', 'user-bubble-container');
 
                 const userProfileImage = document.createElement('img');
-                userProfileImage.src = userImageUrl; // Use the variable
+                userProfileImage.src = userImageUrl; // This should use the variable defined in HTML
                 userProfileImage.classList.add('profile-image');
                 
                 const userBubble = document.createElement('div');
@@ -66,7 +66,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 assistantBubbleContainer.classList.add('bubble-container', 'assistant-bubble-container');
 
                 const assistantProfileImage = document.createElement('img');
-                assistantProfileImage.src = assistantImageUrl; // Use the variable
+                assistantProfileImage.src = assistantImageUrl; // This should use the variable defined in HTML
                 assistantProfileImage.classList.add('profile-image');
                 
                 const assistantBubble = document.createElement('div');
@@ -159,4 +159,9 @@ document.addEventListener('DOMContentLoaded', function() {
             console.error('Error uploading files:', error);
         });
     }
+
+    document.getElementById('logout-button').addEventListener('click', () => {
+        window.location.href = '/logout/';
+    });
+    
 });

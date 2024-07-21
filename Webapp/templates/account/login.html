@@ -1,0 +1,120 @@
+{% load socialaccount %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f9f9f9; /* light gray background */
+            margin: 0;
+            padding: 0;
+        }
+        .login-container {
+            max-width: 350px;
+            margin: 60px auto;
+            padding: 30px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            background-color: #fff; /* white background */
+        }
+        .login-header {
+            margin-bottom: 20px;
+        }
+        .login-header img {
+            width: 50px;
+            height: 50px;
+            margin: 20px auto;
+            display: block;
+        }
+        .login-header h2 {
+            font-weight: bold;
+            color: #333; /* dark gray text */
+        }
+        .login-button {
+            background-color: #4285f4; /* Google blue */
+            color: #fff;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+        }
+        .login-button:hover {
+            background-color: #357ae8; /* darker Google blue */
+        }
+        .google-logo {
+            width: 24px;
+            height: 24px;
+            margin-right: 10px;
+        }
+        .form-input {
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .form-input:focus {
+            border-color: #aaa;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .signup-link {
+            font-size: 14px;
+            color: #666;
+            text-decoration: none;
+        }
+        .signup-link:hover {
+            color: #333;
+        }
+        @media screen and (max-width: 600px) {
+            .login-container {
+                max-width: 90%;
+                margin: 20px auto;
+                padding: 20px;
+            }
+            .login-header img {
+                width: 30px;
+                height: 30px;
+            }
+            .login-button {
+                padding: 10px 15px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-header">
+            <img src="{% static 'images/attachment.png' %}" alt="Your Image">
+            <h2>Login</h2>
+            <p>Sign in to your account</p>
+        </div>
+        <form>
+            <input type="text" class="form-input" placeholder="Username" required>
+            <input type="password" class="form-input" placeholder="Password" required>
+            <button class="login-button">Login</button>
+        </form>
+        <p>Or sign in with:</p>
+        <a href="{% provider_login_url 'google' %}">
+            <button type="button" class="login-button">
+                <img src="https://developers.google.com/identity/images/g-logo.png" alt="Google Logo" class="google-logo">
+                Sign in with Google
+            </button>
+        </a>
+        <p>Don't have an account? <a href="{% url 'signup' %}" class="signup-link">Sign up</a></p>
+    </div>
+</body>
+</html>

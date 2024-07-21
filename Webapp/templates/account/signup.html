@@ -1,0 +1,175 @@
+{% load socialaccount %}
+{% load static  %}
+{% block content %}
+<div class="signup-container">
+    <div class="card">
+        <div class="card-body">
+            <img src="{% static 'images/attachment.png' %}" alt="Sign Up Image" class="signup-image">
+            <h2 class="card-title">Sign up</h2>
+            <p class="card-text">Create an account to get started</p>
+
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" class="form-control" required>
+                    <span class="input-icon"><i class="fas fa-user"></i></span>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" class="form-control" required>
+                    <span class="input-icon"><i class="fas fa-envelope"></i></span>
+                </div>
+                <div class="form-group">
+                    <label for="password1">Password</label>
+                    <input type="password" id="password1" name="password1" class="form-control" required>
+                    <span class="input-icon"><i class="fas fa-lock"></i></span>
+                </div>
+                <div class="form-group">
+                    <label for="password2">Confirm Password</label>
+                    <input type="password" id="password2" name="password2" class="form-control" required>
+                    <span class="input-icon"><i class="fas fa-lock"></i></span>
+                </div>
+                <div class="form-group">
+                    <label for="photo">Profile Photo</label>
+                    <input type="file" id="photo" name="photo" class="form-control" accept="image/*">
+                    <span class="input-icon"><i class="fas fa-camera"></i></span>
+                </div>
+                <button type="submit" class="btn btn-primary">Sign up</button>
+            </form>
+
+            <p class="card-text">Or</p>
+            <a href="{% provider_login_url 'google' %}" class="btn btn-google">
+                <i class="fab fa-google"></i> Sign up with Google
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+    .signup-container {
+        max-width: 400px;
+        margin: 40px auto;
+        padding: 20px;
+    }
+    
+    .card {
+        background-color: #f9f9f9;
+        border: 1px solid #ddd;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        border-radius: 10px;
+    }
+
+    .card-body {
+        padding: 20px;
+    }
+
+    .signup-image {
+        width: 100%;
+        max-width: 200px;
+        margin: 0 auto 20px auto;
+        display: block;
+    }
+
+    .card-title {
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 10px;
+    }
+
+    .card-text {
+        font-size: 16px;
+        margin-bottom: 20px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+        position: relative;
+    }
+
+    .form-control {
+        width: 100%;
+        height: 40px;
+        padding: 10px;
+        font-size: 16px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+
+    .input-icon {
+        position: absolute;
+        top: 12px;
+        left: 10px;
+        font-size: 20px;
+        color: #999;
+    }
+
+    .btn {
+        width: 100%;
+        height: 40px;
+        padding: 10px;
+        font-size: 16px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    .btn-primary {
+        background-color: #337ab7;
+        color: #fff;
+    }
+
+    .btn-google {
+        background-color: #4285f4;
+        color: #fff;
+    }
+
+    .fab {
+        font-size: 20px;
+        margin-right: 10px;
+    }
+
+    /* Media queries for responsiveness */
+    @media (max-width: 768px) {
+        .signup-container {
+            max-width: 300px;
+        }
+        .card {
+            padding: 15px;
+        }
+        .card-body {
+            padding: 15px;
+        }
+        .signup-image {
+            max-width: 150px;
+        }
+        .form-control {
+            height: 35px;
+        }
+        .btn {
+            height: 35px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .signup-container {
+            max-width: 250px;
+        }
+        .card {
+            padding: 10px;
+        }
+        .card-body {
+            padding: 10px;
+        }
+        .signup-image {
+            max-width: 100px;
+        }
+        .form-control {
+            height: 30px;
+        }
+        .btn {
+            height: 30px;
+        }
+    }
+</style>
+{% endblock %}

@@ -110,6 +110,20 @@ body {
   background-color: #444;
 }
 
+.logout-button {
+  background-color: #d9534f;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  margin-left: 10px;
+}
+
+.logout-button:hover {
+  background-color: #c9302c;
+}
+
 .dark-mode-toggle {
   background-color: #333;
   color: #fff;
@@ -222,7 +236,11 @@ body {
   .sidebar-close {
     display: block;
   }
+  .logout-button {
+    margin-left: 5px;
+  }
 }
+
 /* Loading Indicator Styles */
 .loading-indicator {
   display: flex;

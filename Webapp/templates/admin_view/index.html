@@ -6,12 +6,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chat Interface</title>
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <script>
+        // Define the default image URL in JavaScript
+        const defaultUserImageUrl = "{% static 'images/user.jpeg' %}";
+        
+        // Get the profile picture URL from Django context or use the default
+        const userImageUrl = "{{ profile_picture_url }}";
+        const finalUserImageUrl = userImageUrl ? userImageUrl : defaultUserImageUrl;
+
+        const assistantImageUrl = "{% static 'images/AI.jpg' %}";
+    </script>
 </head>
 <body>
     <div class="container">
         <div class="sidebar hidden" id="sidebar">
             <button class="sidebar-close" id="sidebar-close">✖</button>
-            <h2>EASY HEALS</h2>
+            <h2>Easy heals</h2>
             <ul>
                 <li><a href="#">Conversations</a></li>
                 <li><a href="#">Settings</a></li>
@@ -21,6 +31,11 @@
         <div class="chat-container">
             <div class="chat-header">
                 <button class="sidebar-toggle" id="sidebar-toggle">☰</button>
+                <form method="post" action="{% url 'logout' %}" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="logout-button" id="logout-button">Logout</button>
+                </form>
+                
                 <h2>Chat Interface</h2>
                 <button class="dark-mode-toggle" id="dark-mode-toggle">Dark Mode</button>
             </div>
@@ -45,10 +60,5 @@
     </div>
 
     <script src="{% static 'js/scripts.js' %}"></script>
-    <script>
-        const userImageUrl = "{% static 'images/user.jpeg' %}";
-        const assistantImageUrl = "{% static 'images/AI.jpg' %}";
-    </script>
-    
 </body>
 </html>
