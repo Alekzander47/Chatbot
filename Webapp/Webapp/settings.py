@@ -11,7 +11,11 @@ STATIC_DIR = os.path.join(BASE_DIR, 'static')
 
 SECRET_KEY = 'django-insecure-m%9=wo#!x^n39a-8le@qnfp*wf%&q3us#pwnp2v(%#e7@da-hp'
 DEBUG = True
-ALLOWED_HOSTS = ['127.0.0.1']
+ALLOWED_HOSTS = ['127.0.0.1','localhost']
+CSRF_TRUSTED_ORIGINS = [
+    'https://localhost',
+    'https://127.0.0.1',
+]
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -26,7 +30,10 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
+    'allauth.socialaccount.providers.facebook',
+    'allauth.socialaccount.providers.github',
     'core',
+    'sslserver',
 ]
 
 
@@ -39,8 +46,54 @@ SOCIALACCOUNT_PROVIDERS = {
         'AUTH_PARAMS': {
             'access_type': 'online',
         }
+    },
+   'github': {
+        'SCOPE': ['user:email', 'read:user'],
+        'METHOD': 'oauth2',
+        'FIELDS': [
+            'id',
+            'login',
+            'name',
+            'email',
+            'avatar_url',
+            'bio',
+            'location',
+            'company'
+        ],
+        'VERSION': 'v3'
+    },
+    'facebook': {
+        'METHOD': 'oauth2',
+        'SCOPE': ['email', 'public_profile'],
+        'FIELDS': [
+            'email',
+            'name',
+            'first_name',
+            'last_name',
+            'verified',
+            'locale',
+            'timezone',
+            'link',
+            'gender',
+            'updated_time'
+        ],
+        'EXCHANGE_TOKEN': True,
+        'VERIFIED_EMAIL': False,
+        'VERSION': 'v2.12'
     }
+    
 }
+
+
+# SOCIALACCOUNT_PROVIDERS = {
+#     'facebook': {
+#         'APP': {
+#             'client_id': 'your_app_id',
+#             'secret': 'your_app_secret',
+#             'key': ''
+#         }
+#     }
+# }
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

@@ -10,7 +10,7 @@
         body {
             font-family: Arial, sans-serif;
             text-align: center;
-            background-color: #f9f9f9; /* light gray background */
+            background-color: #f9f9f9;
             margin: 0;
             padding: 0;
         }
@@ -21,7 +21,7 @@
             border: 1px solid #ddd;
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            background-color: #fff; /* white background */
+            background-color: #fff;
         }
         .login-header {
             margin-bottom: 20px;
@@ -34,10 +34,10 @@
         }
         .login-header h2 {
             font-weight: bold;
-            color: #333; /* dark gray text */
+            color: #333;
         }
         .login-button {
-            background-color: #4285f4; /* Google blue */
+            background-color: #4285f4;
             color: #fff;
             padding: 12px 20px;
             border: none;
@@ -51,9 +51,9 @@
             width: 100%;
         }
         .login-button:hover {
-            background-color: #357ae8; /* darker Google blue */
+            background-color: #357ae8;
         }
-        .google-logo {
+        .google-logo, .facebook-logo, .github-logo {
             width: 24px;
             height: 24px;
             margin-right: 10px;
@@ -98,7 +98,7 @@
 <body>
     <div class="login-container">
         <div class="login-header">
-            <img src="{% static 'images/attachment.png' %}" alt="Your Image">
+            <img src="{% static 'images/logo.jpeg' %}" alt="Your Image">
             <h2>Login</h2>
             <p>Sign in to your account</p>
         </div>
@@ -112,6 +112,18 @@
             <button type="button" class="login-button">
                 <img src="https://developers.google.com/identity/images/g-logo.png" alt="Google Logo" class="google-logo">
                 Sign in with Google
+            </button>
+        </a>
+        <a href="{% provider_login_url 'facebook' %}">
+            <button type="button" class="login-button" style="background-color: #3b5998;">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/0/05/Facebook_Logo_%282019%29.png" alt="Facebook Logo" class="facebook-logo">
+                Sign in with Facebook
+            </button>
+        </a>
+        <a href="{% provider_login_url 'github' %}">
+            <button type="button" class="login-button" style="background-color: #333;">
+                <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" alt="GitHub Logo" class="github-logo">
+                Sign in with GitHub
             </button>
         </a>
         <p>Don't have an account? <a href="{% url 'signup' %}" class="signup-link">Sign up</a></p>
